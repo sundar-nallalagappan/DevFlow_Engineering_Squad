@@ -1,0 +1,50 @@
+Project Title: DevFlow: The Autonomous Jira-to-GitHub Agent Squad
+1. The Pitch: Why I Built This
+In the modern enterprise, software maintenance is a productivity killer. Critical bugs often get buried in Jira backlogs while developers are distracted by low-priority tasks. As a solo developer, I wanted to multiply my output by creating a virtual engineering team.
+I didn't want to build another chatbot that simply "explains" code. I built a worker that fixes it.
+DevFlow is an autonomous multi-agent system that acts as a "Junior Engineering Squad." It connects real business requirements (Atlassian Jira) to actual code implementation (GitHub). It doesn't just guess; it uses Test-Driven Development (TDD) to verify its own work, keeping the Jira ticket updated with status comments at every stage of the repair process.
+2. The Solution: A Multi-Agent Architecture
+My solution leverages the power of Google Gemini 2.5 to orchestrate a sequential multi-agent workflow. Unlike standard coding assistants, DevFlow is aware of "Business Priority" and maintains a paper trail in Jira.
+The system consists of three distinct agents orchestrated by a Root Manager:
+DevOps_Manager_Agent (The Orchestrator): The root agent that initializes the session, manages memory, and directs the workflow between the sub-agents.
+Sprint_lead_agent (The Gatekeeper):
+Role: Connects to Live Jira.
+Intelligence: It scans the backlog for Project Sales-Dashboard, filters out noise, and identifies the highest priority ticket (e.g., SCRUM-1) based on severity.
+Action: It assigns the ticket and posts an "Investigation Started" comment to Jira.
+dev_expert_agent (The Builder):
+Role: Connects to GitHub and the local execution environment.
+Intelligence: It follows a strict TDD Loop:
+Clones the Sales-Dashboard repo.
+Reproduces the bug by writing a failing test case.
+Refactors the source code.
+Verifies the fix by passing the test.
+Commits & Pushes the code and updates Jira with a "Fix Deployed" comment.
+3. Technical Implementation: Key Course Concepts Applied
+I demonstrated mastery of the Agentic AI curriculum by applying the following key concepts:
+A. Sequential Multi-Agent System & State Management
+I implemented a hierarchical architecture where the DevOps_Manager_Agent maintains the state. The Ticket ID (SCRUM-1) is programmatically extracted from the Sprint_lead_agent's output and passed as context to the dev_expert_agent. I utilized InMemorySessionService to maintain conversation history and context across the workflow.
+B. Extensive Custom Tooling (Real-World Integration)
+Rather than relying on mocks, I built Custom Python Tools to interact with live external APIs:
+Jira Integration: find_open_issues (using JQL sorting), read_ticket_details, post_comment (providing real-time status updates to stakeholders).
+Git Integration: clone_repository (with Windows file-lock handling), push_changes_to_github.
+Local Execution: run_pytest (Enabling the agent to run terminal commands, read stdout/stderr, and self-correct based on error logs).
+C. Observability & Logging
+I implemented the LoggingPlugin within the Agent Runner to trace the execution flow. This provided visibility into the agent's "Thought Process"—seeing exactly when the Sprint_lead_agent handed off control and how the dev_expert_agent analyzed the test failures.
+4. The "Self-Healing" TDD Loop (Innovation)
+The most innovative feature of DevFlow is its adherence to Test-Driven Development. In the demo, the agent:
+Read the SCRUM-1 bug report about "Revenue Under-reporting".
+Autonomously wrote a new unit test asserting the correct logic.
+Ran the test -> FAILED (Red).
+Modified the source code.
+Ran the test -> PASSED (Green).
+This proves the agent isn't just generating text; it is understanding logic and verifying reality.
+5. Challenges, Pivots, and Future Roadmap
+What I Learned (The "Pivot"):
+I initially planned to implement the Model Context Protocol (MCP) for the GitHub integration. However, during integration, I faced environment constraints within the notebook runtime (async event loop conflicts).
+Decision: To prioritize a working prototype, I pivoted to building Native Python Tools wrapping the git CLI. This resulted in a more robust, portable agent for this specific hackathon environment.
+Future Improvements:
+Human-in-the-Loop: While I planned for a "Pause for Approval" step, time constraints required me to automate the push. In the future, I will add a reviewer gate before the git push action.
+FastAPI Deployment: I started building a FastAPI wrapper to trigger the agent via Webhook, but kept the submission CLI-based for demo clarity.
+Parallel Agents: Implementing a "QA Agent" that runs in parallel to write test cases while the Developer analyzes the code.
+6. Conclusion
+DevFlow represents the future of solo development—where AI doesn't just assist, but actively collaborates, triages, tests, and solves problems, allowing me to focus on architecture rather than bug fixes.

@@ -1,0 +1,6 @@
+google-adk
+jira
+pytest
+python-dotenv
+fastapi 
+uvicorn

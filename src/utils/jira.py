@@ -65,5 +65,47 @@ class JiraHandler:
             return json.dumps({'status': f"Successfully commented on {ticket_id}"})
         except Exception as e:
             return json.dumps({'status': f"Error posting comment: {str(e)}"})
-    
-    
+        
+    def update_ticket_status(self, ticket_id, status_name):
+        """
+        Useful for moving a ticket to a new workflow stage.
+        
+        Args:
+            ticket_id: Ticket ID or ticket key to filter the exact Jira ticket
+            status name: 'TO DO', 'IN PROGRESS', 'IN REVIEW', 'DONE'
+
+        Returns:
+            Dictionary with success/failure status 
+        """
+        try:
+            issue = self.jira.issue(ticket_id)
+            
+            # 1. Get all possible transitions for this ticket
+            transitions = self.jira.transitions(issue)
+            
+            # 2. Find the ID associated with the status name
+            transition_id = None
+            for t in transitions:
+                if t['name'].lower() == status_name.lower():
+                    transition_id = t['id']
+                    break
+            
+            if transition_id:
+                # 3. Perform the transition (Status change ONLY)
+                self.jira.transition_issue(issue, transition_id)
+                
+                return json.dumps({
+                    "status": "success", 
+                    "message": f"Ticket {ticket_id} successfully moved to '{status_name}'."
+                })
+            else:
+                allowed = [t['name'] for t in transitions]
+                return {
+                    "status": "error", 
+                    "message": f"Cannot move to '{status_name}'. Allowed statuses: {allowed}"
+                }
+                
+        except Exception as e:
+            return json.dumps({"status": "error", "message": str(e)})
+        
+        

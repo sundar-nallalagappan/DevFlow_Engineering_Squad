@@ -98,6 +98,7 @@ def push_changes_to_github(commit_message: str):
     Stages, Commits, and Pushes all changes to the remote GitHub repo.
     Input: commit_message (e.g., 'Fixed bug in revenue calculation')
     """
+    print('push_changes_to_github')
     try:
         # 1. Git Add (Stage all files)
         subprocess.run(['git', 'add', '.'], cwd=WORKSPACE_DIR, check=True)

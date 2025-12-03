@@ -44,9 +44,6 @@ retry_config=types.HttpRetryOptions(
     http_status_codes=[429, 500, 503, 504] # Retry on these HTTP errors
 )
 
-sprint_lead_agent = sprint_lead_agent()
-developer_agent   = developer_agent()
-
 # Define helper functions that will be reused throughout the notebook
 async def run_session(
     runner_instance: Runner,
@@ -110,12 +107,15 @@ async def run_session(
 
 print("✅ Helper functions defined.")
 
-async def devops_manager():
+async def devops_manager(user_input: str, session_id: str = "default_session"):
+    sprint_lead_agent_instance = sprint_lead_agent() 
+    developer_agent_insatnce   = developer_agent()
+    
     devops_manager_agent = LlmAgent(
         name="DevOps_Manager_agent",
         model=Gemini(model="gemini-2.5-flash-lite", retry_options=retry_config), # Pro is better for "Reasoning" on priority
         instruction=devops_manager_instruction,
-        tools=[AgentTool(sprint_lead_agent), AgentTool(developer_agent)]
+        tools=[AgentTool(sprint_lead_agent_instance), AgentTool(developer_agent_insatnce)]
     )
 
     print("✅ DevOps_Manager_agent created.")
@@ -126,15 +126,19 @@ async def devops_manager():
                                memory_service=memory_service)
                                #plugins=[LoggingPlugin()])
 
+#    response = await run_session(devops_manager_runner, 
+#                             "Check the Jira board for project 'SALES-Dashboard' and pick the next task.",
+#                             'session-04')
     response = await run_session(devops_manager_runner, 
-                             "Check the Jira board for project 'SALES-Dashboard' and pick the next task.",
-                             'session-03')
-    
+                            user_input,  # <--- Dynamic Input
+                            session_id   # <--- Dynamic Session)
+    )
     return response
 
 if __name__ == "__main__":
     print("Firing the devops manager agent")
-    agent_response = asyncio.run(devops_manager())
+    user_input = "Check the Jira board for project 'SALES-Dashboard' and pick the next task."
+    agent_response = asyncio.run(devops_manager(user_input=user_input))
     print('!!!!!!!!!!!*************!!!!!!!!!!!!!!')
     print("Response:", agent_response)
     

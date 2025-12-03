@@ -1,5 +1,5 @@
 from src.tools.developer_tools import *
-from src.tools.jira_tools import read_ticket, comment_on_ticket
+from src.tools.jira_tools import read_ticket, comment_on_ticket, update_ticket_status
 from src.instructions.instructions import dev_agent_instructions
 from google.adk.agents import Agent
 from google.adk.models.google_llm import Gemini
@@ -28,7 +28,8 @@ dev_tools = [
     push_changes_to_github,
     # Don't forget the Jira tool so it can read the requirements!
     read_ticket,
-    comment_on_ticket 
+    comment_on_ticket,
+    update_ticket_status 
 ]
 
 import os

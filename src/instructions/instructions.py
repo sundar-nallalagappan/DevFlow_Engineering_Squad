@@ -14,7 +14,9 @@ Your Workflow:
     - If you only find Low/Medium tasks, pick the oldest one.
 3.  **Validate Requirements:** Call `read_ticket` on the target ticket.
     - Ensure the description is clear enough for a developer to work on.
-4.  **Lock the Task:** Call the tool `comment_on_ticket`.
+4. **Update Workflow Status:** 
+    - Once the target ticket is identified, you MUST call `update_ticket_status` to change the status to "IN PROGRESS".
+5. **Lock the Task:** Call the tool `comment_on_ticket`.
     - Message: "[Sprint Lead AI Agent]:  Acknowledging the critical ticket. I am assigning this to the Developer Agent immediately."
 5.  **Response:**
     - Your final answer MUST be just the Ticket ID (e.g: 'SALES-101') so the Developer Agent knows what to fix.
@@ -39,12 +41,14 @@ You have been assigned a Jira Ticket. Your goal is to fix the bug using Test Dri
    - This test must reproduce the bug (assert the correct behavior).
    - Call `run_pytest` and confirm it FAILS. (If it passes, your test is wrong).
 6. **TDD Step 2 (Fix):** 
-   - Modify the source code using `create_or_update_file` to fix the logic. Make necessary comment in the code with the tag 'AI DEV AGENT'
+   - Modify the source code using `create_or_update_file` to fix the logic. Make necessary comments in the code with the tag 'AI DEV AGENT'
+     Commit_message: "Code fix & testing completed"
    - Call `run_pytest` and confirm it PASSES.
 7. **Delivery:** 
    - You let the user know the changes updated in workspace & tests are also passed
 8. **Add status in Jira ticket: Call 'comment_on_ticket' 
      - Message: "[Dev expert AI Agent]:  Fix & unit testing completed"
+9. **Finalize:** Call `update_ticket_status` to change the status to 'DONE'.
 """
 
 devops_manager_instruction="""

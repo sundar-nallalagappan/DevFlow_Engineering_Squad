@@ -2,7 +2,7 @@ import os
 import json
 
 jira_api_token = os.getenv('JIRA_API_TOKEN')
-print('jira_api_token:', jira_api_token)
+#print('jira_api_token:', jira_api_token)
 from src.utils.jira import JiraHandler
 
 jira = JiraHandler(server_url="https://nsundar.atlassian.net", 
@@ -53,3 +53,18 @@ def comment_on_ticket(ticket_id: str, message: str) -> dict:
         Dictionary with success/failure status 
     """
     return jira.post_comment(ticket_id, message)
+
+def update_ticket_status(ticket_id: str, status: str) -> dict:
+    """
+    Useful for moving a ticket to a new workflow stage in JIRA Board.
+    Does NOT add a comment. If an explanation is needed, use comment_on_ticket afterwards.
+    
+    Args:
+        ticket_id: The Jira Ticket ID (e.g., 'CAP-101')
+        status: The target status. Common values: 'TO DO', 'IN PROGRESS', 'IN REVIEW', 'DONE'.
+
+    Returns:
+        Dictionary with success or failure message.
+    """
+    return jira.update_ticket_status(ticket_id, status)
+

@@ -6,6 +6,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import asyncio
 from dotenv import load_dotenv
+from src.utils.guardrails import validate_safety
 
 # Ensure env is loaded before importing the agent logic
 load_dotenv()
@@ -30,6 +31,17 @@ def health_check():
 @app.post("/api/chat")
 async def chat_endpoint(request: UserRequest):
     try:
+        # 1. RUN SECURITY CHECK
+        security_check = validate_safety(request.query)
+        
+        if not security_check["safe"]:
+        # Return a "403 Forbidden" style response in the chat
+            return {
+                "status": "blocked", 
+                "response": f"🛡️ **GUARDRAIL ACTIVATED**\n\nQuery blocked: {security_check['reason']}",
+                "session_id": request.session_id
+            }
+    
         # Call the agent
         response_text = await devops_manager(request.query, request.session_id)
         
